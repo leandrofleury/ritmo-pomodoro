@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f8f3">
+  <meta name="description" content="Pomodoro tranquilo e offline: ciclos de foco, pausas, tarefas e progresso, com dados salvos no dispositivo.">
+  <meta name="color-scheme" content="light">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Ritmo">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon-192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Ritmo — Pomodoro</title>
+  <script defer src="./app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand" aria-label="Ritmo Pomodoro">
+        <div class="brand-symbol" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+            <circle cx="12" cy="12" r="8.4"></circle><path d="M12 7v5l3.5 2"></path>
+          </svg>
+        </div>
+        <div class="brand-word">ritmo<span>.</span></div>
+      </div>
+      <div class="top-actions">
+        <span class="network-state" id="network-state" aria-live="polite"><span class="network-dot"></span><span id="network-label">Offline pronto</span></span>
+        <button class="install-button" id="install-button" type="button" aria-label="Como instalar o Ritmo">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-4-4 4 4 4-4M5 17v3h14v-3"/></svg>
+          <span id="install-label">Instalar</span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <div class="hero">
+        <div>
+          <p class="overline">SEU ESPAÇO DE CONCENTRAÇÃO</p>
+          <h1>Uma coisa de cada vez<span class="title-period">.</span></h1>
+          <p class="hero-description">Encontre seu ritmo. O resto pode esperar.</p>
+        </div>
+        <div class="session-pill"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8 12 2.6 2.6 5.4-5.4"/></svg><strong id="header-count">0</strong><span>sessões de foco</span></div>
+      </div>
+
+      <div class="main-grid">
+        <section class="timer-card" aria-label="Temporizador Pomodoro">
+          <div class="mode-switch" role="group" aria-label="Selecionar período">
+            <button id="mode-focus" class="mode-button active" type="button" aria-pressed="true">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42"/></svg>
+              Foco
+            </button>
+            <button id="mode-break" class="mode-button" type="button" aria-pressed="false">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h13v8a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5V8Zm13 1h2a3 3 0 0 1 0 6h-2M8 3v2m5-2v2"/></svg>
+              Pausa
+            </button>
+          </div>
+
+          <div class="timer-status" aria-live="polite" aria-atomic="true"><span id="status-dot" class="status-dot"></span><span id="status-text">PRONTO PARA COMEÇAR</span></div>
+          <div class="ring-wrap">
+            <svg class="ring-svg" viewBox="0 0 320 320" aria-hidden="true">
+              <circle cx="160" cy="160" r="143" fill="none" stroke="#e9f0e8" stroke-width="1"/>
+              <circle cx="160" cy="160" r="123" fill="none" stroke="#e1ebe0" stroke-width="10"/>
+              <circle id="progress-ring" class="progress-ring" cx="160" cy="160" r="123" fill="none" stroke="#6fa080" stroke-width="10" stroke-linecap="round"/>
+              <circle cx="160" cy="160" r="106" fill="none" stroke="#eaf1e9" stroke-width="1" stroke-dasharray="2 8"/>
+            </svg>
+            <div class="ring-contents">
+              <span class="ring-caption" id="timer-caption">TEMPO DE FOCO</span>
+              <time id="timer-display" class="timer-display" aria-label="25 minutos e 0 segundos">25:00</time>
+              <span class="ring-subtitle" id="timer-subtitle">Seu momento de concentração</span>
+            </div>
+          </div>
+
+          <div class="timer-controls">
+            <button id="reset-button" type="button" class="control-icon" aria-label="Reiniciar período" title="Reiniciar período">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11a9 9 0 1 1 2.7 6.4"/><path d="M3 4v7h7"/></svg>
+            </button>
+            <button id="start-button" type="button" class="start-button">
+              <svg id="start-icon" class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13L19 12Z"/></svg>
+              <span id="start-label">Iniciar foco</span>
+            </button>
+            <button id="skip-button" type="button" class="control-icon" aria-label="Pular para o próximo período" title="Pular para o próximo período">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m5 5 9 7-9 7V5ZM19 5v14"/></svg>
+            </button>
+          </div>
+
+          <div class="settings">
+            <div class="settings-header"><h2>Seu ciclo</h2><span>Durações em minutos</span></div>
+            <div class="duration-grid">
+              <label class="duration-field">Tempo de foco
+                <div class="duration-control"><input id="focus-duration" type="number" min="1" max="180" step="1" value="25" inputmode="numeric"><span>min</span></div>
+              </label>
+              <label class="duration-field">Tempo de pausa
+                <div class="duration-control"><input id="break-duration" type="number" min="1" max="60" step="1" value="5" inputmode="numeric"><span>min</span></div>
+              </label>
+            </div>
+            <div class="setting-row">
+              <div class="setting-desc"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a5 5 0 0 1 0 6m3-9a9 9 0 0 1 0 12"/></svg><div><strong>Som ao concluir</strong><small>Um aviso suave ao final</small></div></div>
+              <button id="sound-toggle" type="button" class="switch on" role="switch" aria-checked="true" aria-label="Som ao concluir"><span></span></button>
+            </div>
+            <div class="setting-row notification-row">
+              <div class="setting-desc"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><div><strong>Avisos do sistema</strong><small id="notification-description">O app precisa estar em execução</small></div></div>
+              <button id="notify-button" type="button" class="text-action">Ativar</button>
+            </div>
+          </div>
+        </section>
+
+        <div class="side-grid">
+          <section class="side-card tasks-card" aria-labelledby="tasks-title">
+            <div class="card-heading"><h2 id="tasks-title">Minhas tarefas</h2><span id="task-counter" class="task-counter">0 de 0</span></div>
+            <p class="card-description">O que merece sua atenção agora?</p>
+            <form id="task-form" class="task-form" autocomplete="off">
+              <label for="task-input" class="sr-only">Nova tarefa</label>
+              <input id="task-input" maxlength="120" type="text" placeholder="Adicionar uma tarefa..." required>
+              <button type="submit" aria-label="Adicionar tarefa">+</button>
+            </form>
+            <div id="empty-tasks" class="empty-tasks">
+              <div class="empty-illustration" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="3"/><path d="m8 10 2 2 4-4M8 16h8"/></svg></div>
+              <strong>Um começo tranquilo</strong>
+              <p>Adicione o que deseja realizar neste ciclo.</p>
+            </div>
+            <ul id="task-list" class="task-list" aria-label="Tarefas da sessão"></ul>
+            <div class="task-footer"><span id="task-summary">Nenhuma tarefa adicionada</span><button id="clear-done" type="button" class="text-action" hidden>Limpar concluídas</button></div>
+            <div class="task-track" role="progressbar" id="task-progress-aria" aria-label="Progresso das tarefas" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="task-progress" class="task-progress"></div></div>
+          </section>
+
+          <section class="side-card progress-card" aria-labelledby="progress-title">
+            <p id="progress-title" class="overline">SEU PROGRESSO</p>
+            <div class="progress-summary"><div class="star-box" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 3Z"/></svg></div><div><div class="big-count"><strong id="session-count">0</strong><span>sessões</span></div><p>Ciclos de foco concluídos</p></div></div>
+            <div class="progress-footer"><div class="dots-row"><span>Grupo de 4 sessões</span><div id="session-dots" class="session-dots" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div><button id="clear-sessions" type="button" class="text-action">Zerar contagem</button></div>
+          </section>
+
+          <aside class="gentle-note"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22v-9m0 3C5 16 4 11 4 5c6 0 8 3 8 9m0 0c0-5 2-8 8-9 0 6-1 11-8 11"/></svg><p>Pequenos intervalos também fazem parte do progresso. Respeite seu ritmo.</p></aside>
+        </div>
+      </div>
+    </main>
+    <footer class="page-footer"><span>Espaço: iniciar / pausar</span><span aria-hidden="true">•</span><span>R: reiniciar</span><span aria-hidden="true">•</span><span>Seus dados ficam neste dispositivo</span></footer>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" aria-atomic="true" hidden></div>
+
+  <dialog id="install-dialog" class="install-dialog" aria-labelledby="install-title">
+    <div class="dialog-body">
+      <div class="dialog-header"><h2 id="install-title">Instalar Ritmo</h2><button id="close-dialog" class="dialog-close" type="button" aria-label="Fechar">×</button></div>
+      <p>Para usar como aplicativo no Android, abra esta página no Chrome e escolha <strong>⋮ → Instalar aplicativo</strong> ou <strong>Adicionar à tela inicial</strong>.</p>
+      <p>É necessário abrir o site por <strong>HTTPS</strong>. Após a primeira visita online, o Ritmo funciona offline.</p>
+      <button id="close-dialog-primary" type="button" class="start-button dialog-button">Entendi</button>
+    </div>
+  </dialog>
+</body>
+</html>
